@@ -6,13 +6,18 @@ package graph
 import (
 	"context"
 	"fmt"
-
 	generated1 "github.com/robkler/hacknews/graph/generated"
 	model1 "github.com/robkler/hacknews/graph/model"
+	"github.com/robkler/hacknews/pkg/links"
+	"strconv"
 )
 
 func (r *mutationResolver) CreateLink(ctx context.Context, input model1.NewLink) (*model1.Link, error) {
-	panic(fmt.Errorf("not implemented"))
+	var link links.Link
+	link.Title = input.Title
+	link.Address = input.Address
+	linkID := link.Save()
+	return &model1.Link{ID: strconv.FormatInt(linkID, 10), Title:link.Title, Address:link.Address}, nil
 }
 
 func (r *mutationResolver) CreateUser(ctx context.Context, input model1.NewUser) (string, error) {
@@ -28,7 +33,13 @@ func (r *mutationResolver) RefreshToken(ctx context.Context, input model1.Refres
 }
 
 func (r *queryResolver) Links(ctx context.Context) ([]*model1.Link, error) {
-	panic(fmt.Errorf("not implemented"))
+	var resultLinks []*model1.Link
+	var dbLinks []links.Link
+	dbLinks = links.GetAll()
+	for _, link := range dbLinks{
+		resultLinks = append(resultLinks, &model1.Link{ID:link.ID, Title:link.Title, Address:link.Address})
+	}
+	return resultLinks, nil
 }
 
 // Mutation returns generated1.MutationResolver implementation.

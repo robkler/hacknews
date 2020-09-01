@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/robkler/hacknews/graph"
 	"github.com/robkler/hacknews/graph/generated"
+	database "github.com/robkler/hacknews/pkg/db/mysql"
 	"log"
 	"net/http"
 	"os"
@@ -18,7 +19,8 @@ func main() {
 	if port == "" {
 		port = defaultPort
 	}
-
+	database.InitDB()
+	database.Migrate()
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
